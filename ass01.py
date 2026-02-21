@@ -18,7 +18,7 @@ def constant_velocity(t, positions, label, learning_rate=0.01, max_iter=100):
         p0 = p0 - (learning_rate * grad_p0)
 
     final_error = np.sum(( (v * t + p0) - positions)**2)
-    print(f"--- Results for {label} ---")
+    print(f"Results for {label}")
     print(f"Velocity (v_{label.lower()}): {v:.4f}")
     print(f"Initial Pos (p0_{label.lower()}): {p0:.4f}")
     print(f"Residual Error: {final_error:.4f}\n")
@@ -37,7 +37,6 @@ vy, err_y = constant_velocity(t, y_data, "Y")
 vz, err_z = constant_velocity(t, z_data, "Z")
 
 total_residual_error = err_x + err_y + err_z
-print("====================================")
-print(f"FINAL VELOCITY VECTOR: [{vx:.4f}, {vy:.4f}, {vz:.4f}]")
-print(f"TOTAL SUM-OF-SQUARES ERROR: {total_residual_error:.4f}")
-print("====================================")
+
+print(f"Final velocity error: [{vx:.4f}, {vy:.4f}, {vz:.4f}]")
+print(f"Total sum-of-squares error: {total_residual_error:.4f}")
