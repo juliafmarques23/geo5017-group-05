@@ -6,7 +6,8 @@ def constant_velocity(t, positions, label, learning_rate=0.01, max_iter=100):
     p0 = 0.0
     n  = len(t)
     for it in range(max_iter):
-        p_pred = v * t +p0
+        #y = a * x + b
+        p_pred = v * t + p0
         error = p_pred - positions
 
         #gradients
@@ -17,13 +18,40 @@ def constant_velocity(t, positions, label, learning_rate=0.01, max_iter=100):
         v = v - (learning_rate * grad_v)
         p0 = p0 - (learning_rate * grad_p0)
 
-    final_error = np.sum(( (v * t + p0) - positions)**2)
+    final_error = np.sum(((v * t + p0) - positions)**2)
     print(f"Results for {label}")
     print(f"Velocity (v_{label.lower()}): {v:.4f}")
     print(f"Initial Pos (p0_{label.lower()}): {p0:.4f}")
     print(f"Residual Error: {final_error:.4f}\n")
     return v, final_error
 
+def constant_acceleration(t, positions, label, learning_rate=0.01, max_iter=100):
+    a = 0.0
+    v = 0.0
+    p0 = 0.0
+    n  = len(t)
+    for it in range(max_iter):
+        #y = b2 * x**2 + b1 * x + b0
+        #p(t) = (1/2)*a*t**2 + v0*t + p0
+        p_pred = 0.5 * a * t**2 + v * t + p0
+        error = p_pred - positions
+
+        #gradients
+        grad_a = (2/n) * np.sum(error * 0.5 * t**2)
+        grad_v = (2/n) * np.sum(error * t)
+        grad_p0 = (2/n) * np.sum(error)
+
+        #update v and p0
+        a = a - (learning_rate * grad_a)
+        v = v - (learning_rate * grad_v)
+        p0 = p0 - (learning_rate * grad_p0)
+
+    final_error = np.sum(((0.5 * a * t**2 + v * t + p0) - positions)**2)
+    print(f"Results for {label}")
+    print(f"Velocity (v_{label.lower()}): {v:.4f}")
+    print(f"Initial Pos (p0_{label.lower()}): {p0:.4f}")
+    print(f"Residual Error: {final_error:.4f}\n")
+    return v, final_error
 
 # input data
 t = np.array([1, 2, 3, 4, 5, 6])
