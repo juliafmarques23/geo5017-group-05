@@ -43,3 +43,8 @@ vz, err_z = constant_acceleration(t, z_data, "Z")
 total_residual_error = err_x + err_y + err_z
 
 print(f"Total sum-of-squares error: {total_residual_error:.4f}")
+
+#The total error is lower because we increase the polynomial degree
+# of the model from 1 (linear) to 2 (quadratic). we give the acceleration model
+# 3 parameters (a, v, p0).
+# we could improve the model by collecting more data, instead of 6 points.
