@@ -17,7 +17,7 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
         grad_v = (2/n) * np.sum(error * t)
         grad_p0 = (2/n) * np.sum(error)
 
-        #update v and p0
+        #update a, v and p0
         a = a - (learning_rate * grad_a)
         v = v - (learning_rate * grad_v)
         p0 = p0 - (learning_rate * grad_p0)
@@ -42,5 +42,4 @@ vz, err_z = constant_acceleration(t, z_data, "Z")
 
 total_residual_error = err_x + err_y + err_z
 
-print(f"Final velocity error: [{vx:.4f}, {vy:.4f}, {vz:.4f}]")
 print(f"Total sum-of-squares error: {total_residual_error:.4f}")
