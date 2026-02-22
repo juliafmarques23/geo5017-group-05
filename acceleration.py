@@ -27,7 +27,7 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
     print(f"Velocity (v_{label.lower()}): {v:.4f}")
     print(f"Initial Pos (p0_{label.lower()}): {p0:.4f}")
     print(f"Residual Error: {final_error:.4f}\n")
-    return v, final_error
+    return a, v, p0, final_error
 
 # input data
 t = np.array([1, 2, 3, 4, 5, 6])
@@ -36,15 +36,21 @@ y_data = np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91])
 z_data = np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
 
 
-vx, err_x = constant_acceleration(t, x_data, "X")
-vy, err_y = constant_acceleration(t, y_data, "Y")
-vz, err_z = constant_acceleration(t, z_data, "Z")
+ax, vx, p0x, err_x = constant_acceleration(t, x_data, "X")
+ay, vy, p0y, err_y = constant_acceleration(t, y_data, "Y")
+az, vz, p0z, err_z = constant_acceleration(t, z_data, "Z")
 
 total_residual_error = err_x + err_y + err_z
-
 print(f"Total sum-of-squares error: {total_residual_error:.4f}")
 
 #The total error is lower because we increase the polynomial degree
 # of the model from 1 (linear) to 2 (quadratic). we give the acceleration model
 # 3 parameters (a, v, p0).
 # we could improve the model by collecting more data, instead of 6 points.
+
+#for t=7:
+t_next = 7
+x7 = 0.5 * ax * t_next**2 + vx * t_next + p0x
+y7 = 0.5 * ay * t_next**2 + vy * t_next + p0y
+z7 = 0.5 * az * t_next**2 + vz * t_next + p0z
+print(f"Predicted Position at t=7: ({x7:.4f}, {y7:.4f}, {z7:.4f})")
