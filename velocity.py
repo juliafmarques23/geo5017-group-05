@@ -1,7 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
 
-
 def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
     """Solves for constant velocity (v, p0) using Gradient Descent."""
     v, p0 = 0.0, 0.0
