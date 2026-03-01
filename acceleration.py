@@ -27,33 +27,34 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
 
 if __name__ == "__main__":
     t = np.array([1, 2, 3, 4, 5, 6])
-    x_data = np.array([2, 1.08, -0.83, -1.97, -1.31, 0.57])
-    y_data = np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91])
-    z_data = np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
+    data = {
+        'X': np.array([2, 1.08, -0.83, -1.97, -1.31, 0.57]),
+        'Y': np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91]),
+        'Z': np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
+    }
 
-    # Unpack 4 values (a, v, p0, error)
-    ax, vx, p0x, _ = constant_acceleration(t, x_data, "X")
-    ay, vy, p0y, _ = constant_acceleration(t, y_data, "Y")
-    az, vz, p0z, _ = constant_acceleration(t, z_data, "Z")
+    # Results dictionary
+    results = {}
+    for axis, values in data.items():
+        a, v, p0, err = constant_acceleration(t, values, axis)
+        results[axis] = {'a': a, 'v': v, 'p0': p0, 'err': err}
 
+    total_err = sum(r['err'] for r in results.values())
+    print(f"Total Residual Error (Acceleration): {total_err:.4f}")
 
     def get_pos(time, a, v, p0):
         return 0.5 * a * time ** 2 + v * time + p0
 
 
     # Create list of [x, y, z] for t=1 through 7
-    full_trajectory = []
-    for i in range(1, 8):
-        full_trajectory.append([get_pos(i, ax, vx, p0x),
-                                get_pos(i, ay, vy, p0y),
-                                get_pos(i, az, vz, p0z)])
+    full_trajectory = [[get_pos(i, results['X']['a'], results['X']['v'], results['X']['p0']),
+                        get_pos(i, results['Y']['a'], results['Y']['v'], results['Y']['p0']),
+                        get_pos(i, results['Z']['a'], results['Z']['v'], results['Z']['p0'])] for i in range(1, 8)]
 
-    actual_points = list(zip(x_data, y_data, z_data))
-    new_p = actual_points.copy()
-    new_p.append(full_trajectory[-1])
+    actual_points = list(zip(data['X'], data['Y'], data['Z']))
+    new_p = actual_points + [full_trajectory[-1]]
 
-    # Plot using your trajectory.py module
-    trajectory.plot_trajectory(actual_points)
-    trajectory.plot_trajectory(new_p)
-    # Plot of the full predicted trajectory of constant acceleration
-    trajectory.plot_trajectory(full_trajectory)
+    # Plotting
+    trajectory.plot_trajectory(actual_points)  # Actual 1-6
+    trajectory.plot_trajectory(new_p)  # Actual 1-6 + Predicted 7
+    trajectory.plot_trajectory(full_trajectory)  # Full Model 1-7
