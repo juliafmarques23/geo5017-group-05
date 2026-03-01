@@ -6,7 +6,7 @@ def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
     v, p0 = 0.0, 0.0
     n = len(t)
 
-    for _ in range(max_iter):
+    for it in range(max_iter):
         p_pred = v * t + p0
         error = p_pred - positions
 
