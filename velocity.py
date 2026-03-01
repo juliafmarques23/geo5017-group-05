@@ -1,51 +1,43 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
 
 def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
-    """
-    Solves for constant velocity using Gradient Descent.
-    Model: p(t) = v*t +p0
-    """
-    v = 0.0
-    p0 = 0.0
-    n  = len(t)
-    for it in range(max_iter):
-        #y = a * x + b
+    """Solves for constant velocity (v, p0) using Gradient Descent."""
+    v, p0 = 0.0, 0.0
+    n = len(t)
+
+    for _ in range(max_iter):
         p_pred = v * t + p0
         error = p_pred - positions
 
-        # Gradients calculation (partial derivatives)
-        grad_v = (2/n) * np.sum(error * t)
-        grad_p0 = (2/n) * np.sum(error)
+        # Gradient partial derivatives
+        grad_v = (2 / n) * np.sum(error * t)
+        grad_p0 = (2 / n) * np.sum(error)
 
-        # Parameter update: learning rate
-        v = v - (learning_rate * grad_v)
-        p0 = p0 - (learning_rate * grad_p0)
+        # Update parameters
+        v -= learning_rate * grad_v
+        p0 -= learning_rate * grad_p0
 
-    # Sum of Squared Errors (SSE)
-    final_error = np.sum(((v * t + p0) - positions)**2)
+    final_error = np.sum(((v * t + p0) - positions) ** 2)
+    return v, p0, final_error
 
-    # Output results
-    print(f"Results for {label}")
-    print(f"Velocity (v_{label.lower()}): {v:.4f}")
-    print(f"Initial Pos (p0_{label.lower()}): {p0:.4f}")
-    print(f"Residual Error: {final_error:.4f}\n")
 
-    return v, final_error
+if __name__ == "__main__":
+    t = np.array([1, 2, 3, 4, 5, 6])
+    data = {
+        'X': np.array([2, 1.08, -0.83, -1.97, -1.31, 0.57]),
+        'Y': np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91]),
+        'Z': np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
+    }
 
-# Drone tracking data
-t = np.array([1, 2, 3, 4, 5, 6])
-x_data = np.array([2, 1.08, -0.83, -1.97, -1.31, 0.57])
-y_data = np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91])
-z_data = np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
+    # Results dictionary to store outputs
+    results = {}
+    for axis, values in data.items():
+        vx, p0x, err = constant_velocity(t, values, axis)
+        results[axis] = {'v': vx, 'p0': p0x, 'err': err}
 
-# Execute Gradient Descent for each axis
-vx, err_x = constant_velocity(t, x_data, "X")
-vy, err_y = constant_velocity(t, y_data, "Y")
-vz, err_z = constant_velocity(t, z_data, "Z")
+    total_err = sum(r['err'] for r in results.values())
 
-# Combine errors for total residual assessment
-total_residual_error = err_x + err_y + err_z
-
-print(f"Final velocity vector: [{vx:.4f}, {vy:.4f}, {vz:.4f}]")
-print(f"Total sum-of-squares error: {total_residual_error:.4f}")
+    print(f"Total Residual Error (Linear): {total_err:.4f}")
+    print(f"Velocity Vector: [{results['X']['v']:.4f}, {results['Y']['v']:.4f}, {results['Z']['v']:.4f}]")
