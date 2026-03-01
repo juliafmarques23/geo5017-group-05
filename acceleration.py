@@ -1,65 +1,71 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
+
+# --- 1. SOLVER LOGIC ---
 def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=10000):
-    """
-    Solves for constant acceleration using Gradient Descent.
-    Model: p(t) = 0.5*a*t**2 + v*t + p0
-    """
-    a = 0.0
-    v = 0.0
-    p0 = 0.0
-    n  = len(t)
-    for it in range(max_iter):
-        #y = b2 * x**2 + b1 * x + b0
-        #p(t) = (1/2)*a*t**2 + v0*t + p0
-        p_pred = 0.5 * a * t**2 + v * t + p0
+    """Solves for constant acceleration (a, v, p0) using Gradient Descent."""
+    a, v, p0 = 0.0, 0.0, 0.0
+    n = len(t)
+
+    for _ in range(max_iter):
+        p_pred = 0.5 * a * t ** 2 + v * t + p0
         error = p_pred - positions
 
-        # Gradients calculation (partial derivatives)
-        grad_a = (2/n) * np.sum(error * 0.5 * t**2)
-        grad_v = (2/n) * np.sum(error * t)
-        grad_p0 = (2/n) * np.sum(error)
+        # Gradient partial derivatives
+        grad_a = (2 / n) * np.sum(error * 0.5 * t ** 2)
+        grad_v = (2 / n) * np.sum(error * t)
+        grad_p0 = (2 / n) * np.sum(error)
 
-        # Parameter update: learning rate
-        a = a - (learning_rate * grad_a)
-        v = v - (learning_rate * grad_v)
-        p0 = p0 - (learning_rate * grad_p0)
+        # Update parameters
+        a -= learning_rate * grad_a
+        v -= learning_rate * grad_v
+        p0 -= learning_rate * grad_p0
 
-    # Sum of Squared Errors (SSE)
-    final_error = np.sum(((0.5 * a * t**2 + v * t + p0) - positions)**2)
-
-    # Output results
-    print(f"Results for {label}")
-    print(f"Velocity (v_{label.lower()}): {v:.4f}")
-    print(f"Initial Pos (p0_{label.lower()}): {p0:.4f}")
-    print(f"Residual Error: {final_error:.4f}\n")
-
+    final_error = np.sum(((0.5 * a * t ** 2 + v * t + p0) - positions) ** 2)
     return a, v, p0, final_error
 
-# Drone tracking data
-t = np.array([1, 2, 3, 4, 5, 6])
-x_data = np.array([2, 1.08, -0.83, -1.97, -1.31, 0.57])
-y_data = np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91])
-z_data = np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
 
-# Execute Gradient Descent for each axis
-ax, vx, p0x, err_x = constant_acceleration(t, x_data, "X")
-ay, vy, p0y, err_y = constant_acceleration(t, y_data, "Y")
-az, vz, p0z, err_z = constant_acceleration(t, z_data, "Z")
+def plot_comparison(measured, predicted):
+    """Visualizes measured telemetry against predicted trajectory."""
+    mx, my, mz = zip(*measured)
+    px, py, pz = zip(*predicted)
 
-# Combine errors for total residual assessment
-total_residual_error = err_x + err_y + err_z
-print(f"Total sum-of-squares error: {total_residual_error:.4f}")
+    fig = go.Figure()
+    fig.add_trace(go.Scatter3d(x=mx, y=my, z=mz, mode='markers',
+                               marker=dict(size=5, color='red'), name='Measured Data'))
+    fig.add_trace(go.Scatter3d(x=px, y=py, z=pz, mode='lines+markers',
+                               marker=dict(size=3, color='blue'), name='Model Prediction'))
+    fig.show()
 
-#The total error is lower because we increase the polynomial degree
-# of the model from 1 (linear) to 2 (quadratic). we give the acceleration model
-# 3 parameters (a, v, p0).
-# we could improve the model by collecting more data, instead of 6 points.
 
-# for t=7:
-t_next = 7
-x7 = 0.5 * ax * t_next**2 + vx * t_next + p0x
-y7 = 0.5 * ay * t_next**2 + vy * t_next + p0y
-z7 = 0.5 * az * t_next**2 + vz * t_next + p0z
-print(f"Predicted Position at t=7: ({x7:.4f}, {y7:.4f}, {z7:.4f})")
+if __name__ == "__main__":
+    # Data definitions
+    t = np.array([1, 2, 3, 4, 5, 6])
+    x_data = np.array([2, 1.08, -0.83, -1.97, -1.31, 0.57])
+    y_data = np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91])
+    z_data = np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
+
+    # Gradient Descent execution
+    ax, vx, p0x, err_x = constant_acceleration(t, x_data, "X")
+    ay, vy, p0y, err_y = constant_acceleration(t, y_data, "Y")
+    az, vz, p0z, err_z = constant_acceleration(t, z_data, "Z")
+
+    print(f"Total Residual Error: {err_x + err_y + err_z:.4f}")
+
+    # Future prediction (t=7)
+    t_next = 7
+
+
+    def predict(t, a, v, p0): return 0.5 * a * t ** 2 + v * t + p0
+
+
+    x7, y7, z7 = predict(t_next, ax, vx, p0x), predict(t_next, ay, vy, p0y), predict(t_next, az, vz, p0z)
+    print(f"Prediction at t=7: ({x7:.4f}, {y7:.4f}, {z7:.4f})")
+
+    # Data preparation for plotting
+    measured_data = list(zip(x_data, y_data, z_data))
+    predicted_positions = [(predict(i, ax, vx, p0x), predict(i, ay, vy, p0y), predict(i, az, vz, p0z)) for i in t]
+    predicted_positions.append((x7, y7, z7))
+
+    plot_comparison(measured_data, predicted_positions)
