@@ -2,7 +2,7 @@ import numpy as np
 import trajectory
 
 
-def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=10000):
+def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100000):
     """
     Fits a constant-acceleration motion model:
         p(t) = 0.5 * a * t^2 + v * t + p0
