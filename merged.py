@@ -1,6 +1,5 @@
 import numpy as np
 import plotly.graph_objects as go
-import trajectory
 
 def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
     """
@@ -69,27 +68,27 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
 
     return a, v, p0, final_error
 
-# def plot_trajectory(points, title="3D Trajectory"):
-#     """Plot a 3D trajectory given a list of (x, y, z) points."""
-#     x, y, z = zip(*points)
-#
-#     fig = go.Figure()
-#     fig.add_trace(go.Scatter3d(
-#         x=x, y=y, z=z,
-#         mode="lines+markers",
-#         marker=dict(size=5),
-#         line=dict(width=2)
-#     ))
-#
-#     fig.update_layout(
-#         title=title,
-#         scene=dict(
-#             xaxis_title="X",
-#             yaxis_title="Y",
-#             zaxis_title="Z"
-#         )
-#     )
-#     fig.show()
+def plot_trajectory(points, title="3D Trajectory"):
+    """Plot a 3D trajectory given a list of (x, y, z) points."""
+    x, y, z = zip(*points)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter3d(
+        x=x, y=y, z=z,
+        mode="lines+markers",
+        marker=dict(size=5),
+        line=dict(width=2)
+    ))
+
+    fig.update_layout(
+        title=title,
+        scene=dict(
+            xaxis_title="X",
+            yaxis_title="Y",
+            zaxis_title="Z"
+        )
+    )
+    fig.show()
 
 if __name__ == "__main__":
 
@@ -148,7 +147,7 @@ if __name__ == "__main__":
     predicted_points = actual_points + [full_trajectory[-1]]
 
     # Plot
-    # plot_trajectory(actual_points, "Observed Trajectory (t = 1–6)")
-    # plot_trajectory(predicted_points, "Observed + Predicted Position (t = 7)")
-    # plot_trajectory(full_trajectory, "Fitted Constant Acceleration Trajectory (t = 1–7)")
+    plot_trajectory(actual_points, "Observed Trajectory (t = 1–6)")
+    plot_trajectory(predicted_points, "Observed + Predicted Position (t = 7)")
+    plot_trajectory(full_trajectory, "Fitted Constant Acceleration Trajectory (t = 1–7)")
 
