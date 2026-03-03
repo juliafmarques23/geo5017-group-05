@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
 
-def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
+def constant_velocity(t, positions, label, start_v=0.0, start_p=0.0, learning_rate=0.001, max_iter=10000, tolerance=1e-8):
     """
     Fits a constant velocity motion model:
         p(t) = v * t + p0
@@ -9,7 +9,7 @@ def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
     Parameters are estimated using Gradient Descent by minimizing
     the sum-of-squares error between predicted and observed positions.
     """
-    v, p0 = 0.0, 0.0
+    v, p0 = start_v, start_p
     n = len(t)
 
     for it in range(max_iter):
@@ -23,9 +23,19 @@ def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
         grad_v = (2 / n) * np.sum(error * t)
         grad_p0 = (2 / n) * np.sum(error)
 
-        # Gradient descent update step
-        v -= learning_rate * grad_v
-        p0 -= learning_rate * grad_p0
+        # Gradient descent udapte step size
+        sv = learning_rate * grad_v
+        sp = learning_rate * grad_p0
+
+        # Step size check
+        if abs(sv) < tolerance:
+            break
+        elif abs(sp) < tolerance:
+            break
+        
+        # Gradient descent update parameters
+        v -= sv
+        p0 -= sp
 
     # Final sum-of-squares residual error
     final_error = np.sum(((v * t + p0) - positions) ** 2)
