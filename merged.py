@@ -58,6 +58,9 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
         grad_v = (2 / n) * np.sum(error * t)
         grad_p0 = (2 / n) * np.sum(error)
 
+        if np.linalg.norm([grad_a, grad_v, grad_p0]) < 1e-6:
+            break
+
         # Gradient descent parameter update
         a -= learning_rate * grad_a
         v -= learning_rate * grad_v
@@ -68,16 +71,38 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
 
     return a, v, p0, final_error
 
-def plot_trajectory(points, title="3D Trajectory"):
-    """Plot a 3D trajectory given a list of (x, y, z) points."""
-    x, y, z = zip(*points)
+
+def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
+    # Unpack coordinates
+    x_obs, y_obs, z_obs = zip(*observed)
+    x_pred, y_pred, z_pred = zip(*predicted)
 
     fig = go.Figure()
+
+    # Observed points
     fig.add_trace(go.Scatter3d(
-        x=x, y=y, z=z,
+        x=x_obs, y=y_obs, z=z_obs,
+        mode="markers",
+        marker=dict(size=5, color='red'),
+        #line=dict(width=2, color='blue'),
+        name="Observed (t=1-6)"
+    ))
+
+    # Predicted/fitted trajectory
+    fig.add_trace(go.Scatter3d(
+        x=x_pred, y=y_pred, z=z_pred,
         mode="lines+markers",
-        marker=dict(size=5),
-        line=dict(width=2)
+        marker=dict(size=5, color='darkblue'),
+        line=dict(width=2, color='darkblue', dash='dash'),
+        name="Fitted Constant Acceleration (t=1-7)"
+    ))
+
+    # Highlight 7th predicted point
+    fig.add_trace(go.Scatter3d(
+        x=[x_pred[-1]], y=[y_pred[-1]], z=[z_pred[-1]],
+        mode="markers",
+        marker=dict(size=5, color='darkgreen'),
+        name=f"Predicted t={t_pred}"
     ))
 
     fig.update_layout(
@@ -88,6 +113,7 @@ def plot_trajectory(points, title="3D Trajectory"):
             zaxis_title="Z"
         )
     )
+
     fig.show()
 
 if __name__ == "__main__":
@@ -147,7 +173,8 @@ if __name__ == "__main__":
     predicted_points = actual_points + [full_trajectory[-1]]
 
     # Plot
-    plot_trajectory(actual_points, "Observed Trajectory (t = 1–6)")
-    plot_trajectory(predicted_points, "Observed + Predicted Position (t = 7)")
-    plot_trajectory(full_trajectory, "Fitted Constant Acceleration Trajectory (t = 1–7)")
+    plot_trajectory(actual_points, full_trajectory)
+    # plot_trajectory(actual_points, "Observed Trajectory (t = 1–6)")
+    # plot_trajectory(predicted_points, "Observed + Predicted Position (t = 7)")
+    # plot_trajectory(full_trajectory, "Fitted Constant Acceleration Trajectory (t = 1–7)")
 
