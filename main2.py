@@ -22,8 +22,7 @@ def main():
     data = {
         'X': points_dimensions[0],
         'Y': points_dimensions[1],
-        'Z': points_dimension[2])
-    }
+        'Z': points_dimensions[2]}
 
     # CONSTANT VELOCITY MODEL:
 
@@ -32,7 +31,7 @@ def main():
 
     # Fit constant velocity model independently for X, Y, and Z
     for axis, values in data.items():
-        vx, p0x, err = constant_velocity(time, values, axis)
+        vx, p0x, err = velocity.constant_velocity(time, values, axis)
         results_constantv[axis] = {'v': vx, 'p0': p0x, 'err': err}
 
     # Total residual error across all dimensions
@@ -48,7 +47,7 @@ def main():
 
     # Fit motion model independently for X, Y, Z
     for axis, values in data.items():
-        a, v, p0, err = constant_acceleration(t, values, axis)
+        a, v, p0, err = acceleration.constant_acceleration(time, values, axis)
         results_acceleration[axis] = {'a': a, 'v': v, 'p0': p0, 'err': err}
 
     # Combined residual error acros all axes
@@ -73,5 +72,5 @@ def main():
     trajectory.plot_trajectory(new_p)  # Observed + Predicted (1-7)
     trajectory.plot_trajectory(full_trajectory)  # Full fitted model (1-7)
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
