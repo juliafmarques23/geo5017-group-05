@@ -71,7 +71,6 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
 
     return a, v, p0, final_error
 
-
 def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
     # Unpack coordinates
     x_obs, y_obs, z_obs = zip(*observed)
@@ -82,9 +81,9 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
     # Observed points
     fig.add_trace(go.Scatter3d(
         x=x_obs, y=y_obs, z=z_obs,
-        mode="markers",
+        mode="lines+markers",
         marker=dict(size=5, color='red'),
-        #line=dict(width=2, color='blue'),
+        line=dict(width=2, color='red',  dash='dash'),
         name="Observed (t=1-6)"
     ))
 
@@ -93,7 +92,7 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
         x=x_pred, y=y_pred, z=z_pred,
         mode="lines+markers",
         marker=dict(size=5, color='darkblue'),
-        line=dict(width=2, color='darkblue', dash='dash'),
+        line=dict(width=2, color='darkblue'),
         name="Fitted Constant Acceleration (t=1-7)"
     ))
 
@@ -101,7 +100,7 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
     fig.add_trace(go.Scatter3d(
         x=[x_pred[-1]], y=[y_pred[-1]], z=[z_pred[-1]],
         mode="markers",
-        marker=dict(size=5, color='darkgreen'),
+        marker=dict(size=7, color='green'),
         name=f"Predicted t={t_pred}"
     ))
 
@@ -127,7 +126,6 @@ if __name__ == "__main__":
         'Y': np.array([0, 1.68, 1.82, 0.28, -1.51, -1.91]),
         'Z': np.array([1, 2.38, 2.49, 2.15, 2.59, 4.32])
     }
-
 
     # Constant Velocity Results
     vel_results = {}
