@@ -1,31 +1,25 @@
-# geo5017-group-05
-GEO5017 - Machine Learning (2026) group assignments.
+# GEO5017 - Machine Learning (2026) Assignment 1
 
-**_Students:_**  
-Chaeyeon Moon (6477453)
-Evangelia Palli (0000000)
-Julia Fossa Marques (655097)
+**Group 05:**  
+Chaeyeon Moon (6477453)  
+Evangelia Palli (643593)  
+Julia Fossa Marques (6550975)  
 
-# geo5017-group-05
-GEO5017 - Machine Learning (2026) group assignments.
+### Project: Linear Regression / Drone Trajectory Analysis
 
-**_Students:_**  
-Chaeyeon Moon (6477453)
-Evangelia Palli (0000000)
-Julia Fossa Marques (6550975)
+#### Description: 
 
-Provide a ‘ReadMe.txt’ file to briefly explain how to run the code and reproduce the results, e.g.,
+This project implements polynomial regression using gradient descent to model the motion of a drone in 3D space. Two motion models are considered:
 
-dependence on external libraries/packages (includingthe commands for installing them),
-the path to data,
-where to find the results in case you save results or figures into files ###Descrition
-This code was re
+Constant velocity
+Constant acceleration
 
-The main function was specifically designed to answer the questions of this assignment, using the data provided for it; if the function is called as main, it is not necessary to provide any arguments to reproduce the results shown in the report.
+The program fits the models to observed positions and predicts the drone's next position (t=7) based on the constant acceleration model. It also plots the 3D trajectory using Plotly.
 
-The file also contains the definition for functions constant_velocity, constant_acceleration and plot_trajectoy can be called indepentently from the terminal, or as part of other scripts, with different arguments.
+The main function was specifically designed to answer the questions of this assignment, using the data provided for it; it is not necessary to provide any aditional arguments to reproduce the results shown in the report.
 
 Setup
+
 The program works with minimal setup; the only modules required, besides Python's standard library, are numpy and plotly.
 
 Install numpy (directly from the command prompt)
@@ -110,4 +104,6 @@ Predicted position at t=7
 Notes:
 
 Learning rate and max iterations for gradient descent can be modified in main.py by changing the parameters 'learning_rate' and 'max_iter'
-The code is fully reproducible with the provided data points.
+The code is fully reproducible w
+
+ith the provided data points.
