@@ -19,9 +19,9 @@ def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
         # Residual error
         error = p_pred - positions
 
-        # Gradient of the mean squared error
-        grad_v = (2 / n) * np.sum(error * t)
-        grad_p0 = (2 / n) * np.sum(error)
+        # Gradient of the sum-of-squares error
+        grad_v = 2 * np.sum(error * t)
+        grad_p0 = 2 * np.sum(error)
 
         # Gradient descent update step
         v -= learning_rate * grad_v
@@ -53,7 +53,7 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
         # Residual error
         error = p_pred - positions
 
-        # Gradients of Mean Squared Error according to parameters
+        # Gradient of the sum-of-squares error
         grad_a = 2  * np.sum(error * 0.5 * t ** 2)
         grad_v = 2 * np.sum(error * t)
         grad_p0 = 2 * np.sum(error)
