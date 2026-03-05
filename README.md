@@ -7,49 +7,31 @@ Julia Fossa Marques (6550975)
 
 ### Project: Linear Regression / Drone Trajectory Analysis
 
-#### Description: 
+#### Description
 
 This project implements polynomial regression using gradient descent to model the motion of a drone in 3D space. Two motion models are considered:
 
-Constant velocity
-Constant acceleration
+- Constant velocity
+- Constant acceleration
 
 The program fits the models to observed positions and predicts the drone's next position (t=7) based on the constant acceleration model. It also plots the 3D trajectory using Plotly.
 
 The main function was specifically designed to answer the questions of this assignment, using the data provided for it; it is not necessary to provide any aditional arguments to reproduce the results shown in the report.
 
-Setup
+#### Setup
 
 The program works with minimal setup; the only modules required, besides Python's standard library, are numpy and plotly.
 
-Install numpy (directly from the command prompt)
-
+**Install numpy** (directly from the command prompt)
+```
 pyhton -m pip install numpy
-
-Install plotly (directly from the command prompt)
-
+```
+**Install plotly** (directly from the command prompt)
+```
 python -m pip install plotly
+```
 
-Parameters:
-t : array_like
-Timestamps of the position measurements.
-
-positions : array_like
-Measured positions in relation to an specific axis. Must have the same lenght as t.
-
-learning_rate : float, optional
-Learning rate of the gradient descent algorithm. If it is not specified, the default value (0.001) is used.
-
-Setup
-Install numpy
-
-pip install numpy
-
-Install plotly
-
-pip install plotly
-
-Parameters:
+**Parameters**
 t : array_like
 Timestamps of the position measurements.
 
@@ -61,6 +43,8 @@ Learning rate of the gradient descent algorithm. If it is not specified, the def
 
 max_iter : int, optional
 Maximum number of times the parameters optimization is performed. If it is not specified, the default value (10,000) is used. If it is not specified, the default value (1e-8) is used.*
+
+
 
 GEO5017 A1 – Group 05
 Project: Linear Regression / Drone Trajectory Analysis
