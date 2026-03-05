@@ -1,3 +1,42 @@
+Provide a ‘ReadMe.txt’ file to briefly explain how to run the code and
+reproduce the results, e.g., 
+- dependence on external libraries/packages (includingthe commands for installing them),
+- the path to data,
+- where to find the results in case you save results or figures into files
+###Descrition
+
+This code was re
+
+The main function was specifically designed to answer the questions of this assignment, using the data provided for it; if the function is called as main, it is not necessary to provide any arguments to reproduce the results shown in the report.
+
+The file also contains the definition for  functions _constant_velocity_, _constant_acceleration_ and _plot_trajectoy_ can be called indepentently from the terminal, or as part of other scripts, with different arguments. 
+
+### Setup
+
+The program works with minimal setup; the only modules required, besides Python's standard library, are numpy and plotly.
+
+**Install numpy (directly from the command prompt)**
+
+ > pyhton -m pip install numpy
+
+**Install plotly (directly from the command prompt)**
+
+> python -m pip install plotly
+
+### **Parameters:**
+
+**t** : array_like  
+*Timestamps of the position measurements.*
+
+**positions** : array_like  
+  *Measured positions in relation to an specific axis. Must have the same lenght as* t.
+
+**learning_rate** : float, optional  
+  *Learning rate of the gradient descent algorithm. 
+  If it is not specified, the default value (0.001) is used.*
+
+
+
 ### Setup
 
 Install numpy
@@ -16,17 +55,6 @@ Install plotly
 **positions** : array_like  
   *Measured positions in relation to an specific axis. Must have the same lenght as* t.
 
-**label** : string  
-  *Axis for which the measuraments were made* (e.g. "X").
-
-**start_p0** : float, optional  
-  *Starting value for the initial position.
-  If it is not specified, the default value (0.0) is used.*
-
-**start_v** : float, optional  
-  *Starting value for the velocity.
-  If it is not specified, the default value (0.0) is used.*
-
 **learning_rate** : float, optional  
   *Learning rate of the gradient descent algorithm. 
   If it is not specified, the default value (0.001) is used.*
@@ -34,8 +62,5 @@ Install plotly
 **max_iter** : int, optional  
   *Maximum number of times the parameters optimization is performed.
   If it is not specified, the default value (10,000) is used.*
-
-**tolerance** : float, optional  
-  *Minimum step size for parameter optimization.
   If it is not specified, the default value (1e-8) is used.*
   
