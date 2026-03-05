@@ -2,7 +2,7 @@
 
 **Group 05:**  
 Chaeyeon Moon (6477453)  
-Evangelia Palli (643593)  
+Evangelia Palli (6435939)  
 Julia Fossa Marques (6550975)  
 
 ### Project: Linear Regression / Drone Trajectory Analysis
