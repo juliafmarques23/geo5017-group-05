@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
 
-def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
+def constant_velocity(t, positions, learning_rate=0.001, max_iter=100000):
     """
     Fits a constant velocity motion model:
         p(t) = v * t + p0
@@ -10,7 +10,6 @@ def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
     the sum-of-squares error between predicted and observed positions.
     """
     v, p0 = 0.0, 0.0
-    n = len(t)
 
     for it in range(max_iter):
         # Predicted positions using current parameters
@@ -31,7 +30,7 @@ def constant_velocity(t, positions, label, learning_rate=0.001, max_iter=10000):
     final_error = np.sum(((v * t + p0) - positions) ** 2)
     return v, p0, final_error
 
-def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100000):
+def constant_acceleration(t, positions, learning_rate=0.001, max_iter=100000):
     """
     Fits a constant-acceleration motion model:
         p(t) = 0.5 * a * t^2 + v * t + p0
@@ -44,7 +43,6 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
 
     # Initialize parameters
     a, v, p0 = 0.0, 0.0, 0.0
-    n = len(t)
 
     for it in range(max_iter):
         # Predicted positions using current parameters
@@ -113,10 +111,9 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
         )
     )
 
-    fig.show()
+    fig.show(rendered="browser")
 
-if __name__ == "__main__":
-
+def main():
     # Time steps
     t = np.array([1, 2, 3, 4, 5, 6])
 
@@ -130,7 +127,7 @@ if __name__ == "__main__":
     # Constant Velocity Results
     vel_results = {}
     for axis, values in data.items():
-        v, p0, err = constant_velocity(t, values, axis)
+        v, p0, err = constant_velocity(t, values)
         vel_results[axis] = {'v': v, 'p0': p0, 'err': err}
 
     total_vel_error = sum(r['err'] for r in vel_results.values())
@@ -145,7 +142,7 @@ if __name__ == "__main__":
     # Constant Acceleration Results
     acc_results = {}
     for axis, values in data.items():
-        a, v, p0, err = constant_acceleration(t, values, axis)
+        a, v, p0, err = constant_acceleration(t, values)
         acc_results[axis] = {'a': a, 'v': v, 'p0': p0, 'err': err}
 
     total_acc_error = sum(r['err'] for r in acc_results.values())
@@ -157,7 +154,7 @@ if __name__ == "__main__":
     actual_points = list(zip(data['X'], data['Y'], data['Z']))
 
     def get_pos(t, a, v, p0):
-        return 0.5 * a * t**2 + v * t + p0
+        return 0.5 * a * t ** 2 + v * t + p0
 
     full_trajectory = [
         (
@@ -167,12 +164,13 @@ if __name__ == "__main__":
         )
         for i in range(1, 8)
     ]
-
-    predicted_points = actual_points + [full_trajectory[-1]]
+    print(
+        f"Predicted position for t=7: [{float(full_trajectory[-1][0]):.4f}, {float(full_trajectory[-1][1]):.4f}, {float(full_trajectory[-1][2]):.4f}]")
 
     # Plot
     plot_trajectory(actual_points, full_trajectory)
-    # plot_trajectory(actual_points, "Observed Trajectory (t = 1–6)")
-    # plot_trajectory(predicted_points, "Observed + Predicted Position (t = 7)")
-    # plot_trajectory(full_trajectory, "Fitted Constant Acceleration Trajectory (t = 1–7)")
+
+if __name__ == "__main__":
+    main()
+
 
