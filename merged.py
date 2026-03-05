@@ -1,7 +1,7 @@
 import numpy as np
 import plotly.graph_objects as go
 
-def constant_velocity(t, positions, learning_rate=0.001, max_iter=100000):
+def constant_velocity(t, positions, learning_rate, max_iter):
     """
     Fits a constant velocity motion model:
         p(t) = v * t + p0
@@ -30,7 +30,7 @@ def constant_velocity(t, positions, learning_rate=0.001, max_iter=100000):
     final_error = np.sum(((v * t + p0) - positions) ** 2)
     return v, p0, final_error
 
-def constant_acceleration(t, positions, learning_rate=0.001, max_iter=100000):
+def constant_acceleration(t, positions, learning_rate, max_iter):
     """
     Fits a constant-acceleration motion model:
         p(t) = 0.5 * a * t^2 + v * t + p0
@@ -111,9 +111,9 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
         )
     )
 
-    fig.show(rendered="browser")
+    fig.show(renderer="browser")
 
-def main():
+def main(learning_rate, max_iter):
     # Time steps
     t = np.array([1, 2, 3, 4, 5, 6])
 
@@ -127,7 +127,7 @@ def main():
     # Constant Velocity Results
     vel_results = {}
     for axis, values in data.items():
-        v, p0, err = constant_velocity(t, values)
+        v, p0, err = constant_velocity(t, values, learning_rate, max_iter)
         vel_results[axis] = {'v': v, 'p0': p0, 'err': err}
 
     total_vel_error = sum(r['err'] for r in vel_results.values())
@@ -142,7 +142,7 @@ def main():
     # Constant Acceleration Results
     acc_results = {}
     for axis, values in data.items():
-        a, v, p0, err = constant_acceleration(t, values)
+        a, v, p0, err = constant_acceleration(t, values, learning_rate, max_iter)
         acc_results[axis] = {'a': a, 'v': v, 'p0': p0, 'err': err}
 
     total_acc_error = sum(r['err'] for r in acc_results.values())
@@ -171,6 +171,5 @@ def main():
     plot_trajectory(actual_points, full_trajectory)
 
 if __name__ == "__main__":
-    main()
-
+    main(learning_rate=0.001, max_iter=100000)
 
