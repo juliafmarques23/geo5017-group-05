@@ -54,9 +54,9 @@ def constant_acceleration(t, positions, label, learning_rate=0.001, max_iter=100
         error = p_pred - positions
 
         # Gradients of Mean Squared Error according to parameters
-        grad_a = (2 / n) * np.sum(error * 0.5 * t ** 2)
-        grad_v = (2 / n) * np.sum(error * t)
-        grad_p0 = (2 / n) * np.sum(error)
+        grad_a = 2  * np.sum(error * 0.5 * t ** 2)
+        grad_v = 2 * np.sum(error * t)
+        grad_p0 = 2 * np.sum(error)
 
         if np.linalg.norm([grad_a, grad_v, grad_p0]) < 1e-6:
             break
@@ -100,7 +100,7 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
     fig.add_trace(go.Scatter3d(
         x=[x_pred[-1]], y=[y_pred[-1]], z=[z_pred[-1]],
         mode="markers",
-        marker=dict(size=7, color='blue'),
+        marker=dict(size=7, color='green'),
         name=f"Predicted t={t_pred}"
     ))
 
