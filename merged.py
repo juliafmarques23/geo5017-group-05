@@ -100,7 +100,7 @@ def plot_trajectory(observed, predicted, t_pred=7, title="3D Trajectory"):
     fig.add_trace(go.Scatter3d(
         x=[x_pred[-1]], y=[y_pred[-1]], z=[z_pred[-1]],
         mode="markers",
-        marker=dict(size=7, color='green'),
+        marker=dict(size=7, color='blue'),
         name=f"Predicted t={t_pred}"
     ))
 
