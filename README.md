@@ -49,7 +49,7 @@ Maximum number of times the parameters optimization is performed. If it is not s
 1. Navigate to the `/code/` folder
 2. Run `main.py`
 
-### Expected output
+### Expected Output
 - Velocity vector for constant velocity model
 - Residual errors for constant velocity and acceleration models
 - 3D plot showing:
