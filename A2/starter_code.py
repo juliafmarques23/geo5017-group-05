@@ -42,6 +42,9 @@ class urban_object:
         # initialize the feature vector
         self.feature = []
 
+        # initialize the list for feature names
+        self.feature_names = []
+
     def compute_features(self):
         """
         Compute the features, here we provide two example features. You're encouraged to design your own features
@@ -49,6 +52,7 @@ class urban_object:
         # [feature 1] height
         height = np.amax(self.points[:, 2])
         self.feature.append(height)
+        self.feature_names.append('height')
 
         # get the root point and top point
         root = self.points[[np.argmin(self.points[:, 2])]]
@@ -63,17 +67,20 @@ class urban_object:
         count = kd_tree_2d.query_radius(root[:, :2], r=radius_root, count_only=True)
         root_density = 1.0*count[0] / len(self.points)
         self.feature.append(root_density)
+        self.feature_names.append('root_density')
 
         # [feature 3] area
         # compute the 2D footprint and calculate its area
         hull_2d = ConvexHull(self.points[:, :2])
         hull_area = hull_2d.volume
         self.feature.append(hull_area)
+        self.feature_names.append('hull_area')
 
         # [feature 4] (hull) shape_index  # compactness
         hull_perimeter = hull_2d.area
         shape_index = 1.0 * hull_area / hull_perimeter
         self.feature.append(shape_index)
+        self.feature_names.append('shape_index')
 
         # obtain the point cluster near the top area
         k_top = max(int(len(self.points) * 0.005), 100)
@@ -91,6 +98,8 @@ class urban_object:
         linearity = (w[2]-w[1]) / (w[2] + 1e-5)  # 0 ~ 1
         sphericity = w[0] / (w[2] + 1e-5)        # 0 ~ 1
         self.feature += [linearity, sphericity]
+        self.feature_names.append('linearity')
+        self.feature_names.append('sphericity')
 
         # [+ feature 7] planarity
         cov_global = np.cov(self.points.T)
@@ -98,6 +107,7 @@ class urban_object:
         w_global.sort()
         planarity = (w_global[2] - w_global[0]) / (w_global[2] + 1e-5)
         self.feature.append(planarity)
+        self.feature_names.append('planarity')
 
         # [+ feature 8] 3d bounding box volume
         dx = np.amax(self.points[:, 0]) - np.amin(self.points[:, 0])
@@ -105,10 +115,12 @@ class urban_object:
         dz = np.amax(self.points[:, 2]) - np.amin(self.points[:, 2])
         bbox_vol = dx * dy * dz
         self.feature.append(bbox_vol)
+        self.feature_names.append('bbox_vol')
 
         # [+ feature 9] 3d bounding box density
         bbox_density = len(self.points) / (bbox_vol + 1e-5)
         self.feature.append(bbox_density)
+        self.feature_names.append('bbox_density')
 
         # [+ feature 10] upper half ratio
         top_z = top[0, 2]
@@ -117,17 +129,21 @@ class urban_object:
         total_points = len(self.points)
         upper_half_ratio = above_median_z / total_points
         self.feature.append(upper_half_ratio)
+        self.feature_names.append('upper_half_ratio')
 
         # [+ feature 11] minimum z (root)
         root_z = root[0, 2]
         self.feature.append(root_z)
+        self.feature_names.append('root_z')
 
         # [+ feature 12] z variance
         z_var = np.var(self.points[:, 2])
         self.feature.append(z_var)
+        self.feature_names.append('z_var')
 
         # [+ feature 13] total number of points
         self.feature.append(total_points)
+        self.feature_names.append('total_points')
 
 
 def read_xyz(filenm):
@@ -150,10 +166,7 @@ def feature_preparation(data_path):
     Prepare features of the input point cloud objects
         data_path: the path to read data
     """
-    # check if the current data file exist
     data_file = 'data.txt'
-    #if exists(data_file):
-    #    return
 
     # obtain the files in the folder
     files = sorted(listdir(data_path))
@@ -161,9 +174,12 @@ def feature_preparation(data_path):
     # initialize the data
     input_data = []
 
+    # initialize the list for feature names
+    ft_names = []
+
     # retrieve each data object and obtain the feature vector
     for file_i in tqdm(files, total=len(files)):
-        if file_i.startswith('.'): #or file_i.startswith('163') or file_i.startswith('060'):
+        if file_i.startswith('.'):
             continue
         # obtain the file name
         file_name = join(data_path, file_i)
@@ -178,95 +194,94 @@ def feature_preparation(data_path):
         i_data = [i_object.cloud_ID, i_object.label] + i_object.feature
         input_data += [i_data]
 
+        # obtain the feature name list
+        if ft_names == i_object.feature_names:
+            pass
+        else:
+            ft_names = i_object.feature_names
+
     # transform the output data
     outputs = np.array(input_data).astype(np.float32)
 
     # write the output to a local file
-    data_header = 'ID,label,\
-                   height,root_density,area,shape_index,linearity,sphericity,\
-                   planarity,bbox_vol,bbox_density,upper_half_ratio,min_z,z_var,total_points'
+    features = ",".join(ft_names)
+    data_header = f'ID,label,{features}'
     np.savetxt(data_file, outputs, fmt='%10.5f', delimiter=',', newline='\n', header=data_header)
 
-
-def data_loading(data_file='data.txt'):
-    """
-    Read the data with features from the data file
-        data_file: the local file to read data with features and labels
-    """
-    # load data
-    data = np.loadtxt(data_file, dtype=np.float32, delimiter=',', comments='#')
-
-    # extract object ID, feature X and label Y
-    ID = data[:, 0].astype(np.int32)
-    y = data[:, 1].astype(np.int32)
-    X = data[:, 2:].astype(np.float32)
-
-    return ID, X, y
+    return outputs, ft_names
 
 
-def feature_visualization(X):
-    """
-    Visualize the features
-        X: input features. This assumes classes are stored in a sequential manner
-    """
-    # initialize a plot
-    fig = plt.figure()
-    ax = fig.add_subplot()
-    plt.title("feature subset visualization of 5 classes", fontsize="small")
+def feature_selection(outputs, ft_names):
+    ft_idx_name = {}  # {feature_index : feature_name}
+    for name in ft_names:
+        ft_idx_name[ft_names.index(name)] = name
 
-    # define the labels and corresponding colors
-    colors = ['firebrick', 'grey', 'darkorange', 'dodgerblue', 'olivedrab']
-    labels = ['building', 'car', 'fence', 'pole', 'tree']
+    # obtain the unique label (class) list (e.g., [0, 1, 2, 3, 4]
+    class_col = outputs[:, 1]
+    unique_class = np.unique(class_col)
 
-    # plot the data with first two features
-    for i in range(5):
-        ax.scatter(X[100*i:100*(i+1), 9], X[100*i:100*(i+1), 11], marker="o", c=colors[i], edgecolor="k", label=labels[i])
+    # make the array that contains label (class) column and feature columns
+    ft_matrix = outputs[:, 1:]  # # [label, ft1, ft2, ...]
 
-    # show the figure with labels
-    """
-    Replace the axis labels with your own feature names
-    """
-    #ax.set_xlabel('x1:height')  # 0
-    #ax.set_ylabel('x2:root density')  # 1
-    # ax.set_xlabel('x1:hull area')  # 2
-    # ax.set_ylabel('x2:shape index')  # 3
-    # ax.set_xlabel('x1:linearity')  # 4
-    #ax.set_ylabel('x2:sphericity')  # 5
-    #ax.set_xlabel('x1:planarity')  # 6
-    #ax.set_xlabel('x1:bbox_vol')  # 6
-    #ax.set_ylabel('x2:bbox_density')  # 7
-    ax.set_ylabel('x2:z_var')  # 8
-    #ax.set_ylabel('x2:root_z')  # 9
-    ax.set_xlabel('x1:upper_half_ratio')  # 10
-    # ax.set_ylabel('x2:shape index')  # 3
-    ax.legend()
-    plt.show()
+    # obtain the total number of the features
+    total_feature_count = len(ft_names)
 
+    # initialize the list for the selected 4 features
+    selected_ft_idx = []
 
-def SVM_classification(X, y):
-    """
-    Conduct SVM classification
-        X: features
-        y: labels
-    """
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
-    clf = svm.SVC()
-    clf.fit(X_train, y_train)
-    y_preds = clf.predict(X_test)
-    acc = accuracy_score(y_test, y_preds)
-    print("SVM accuracy: %5.2f" % acc)
-    print("confusion matrix")
-    conf = confusion_matrix(y_test, y_preds)
-    print(conf)
+    for i in range(1, 5):
+        # initialize the temporary J value and candidate feature set
+        best_j = -np.inf
+        best_ft_set = None
 
+        for ft_idx in range(0, total_feature_count):
+            test_ft_set = selected_ft_idx.copy()
+            if ft_idx in test_ft_set:
+                continue
 
-def RF_classification(X, y):
-    """
-    Conduct RF classification
-        X: features
-        y: labels
-    """
-    pass
+            test_ft_set.append(ft_idx)
+
+            col_num = [int(x + 1) for x in test_ft_set]
+            col_num.insert(0, 0)  # add the label column
+
+            test_ft_matrix = ft_matrix[:, col_num]  # [label, candidate_ft1, candidate_ft2, ...]
+
+            n = ft_matrix.shape[0]                                 # total number of data samples
+            test_ft_mean = np.mean(test_ft_matrix[:, 1:], axis=0)  # mean of all data samples (by feature)
+
+            # initialize the metrics
+            sw = np.zeros((i, i))  # within-class scatter matrix
+            sb = np.zeros((i, i))  # between-class scatter matrix
+
+            for k in unique_class:  # k == class index
+                k_test_ft_matrix = test_ft_matrix[test_ft_matrix[:, 0].astype(int) == int(k)][:, 1:]  # [candidate_ft1, candidate_ft2, ...]
+
+                nk = k_test_ft_matrix.shape[0]                      # the number of data samples of class k
+                k_test_ft_mean = np.mean(k_test_ft_matrix, axis=0)  # mean of class k samples (by feature)
+
+                diff = k_test_ft_matrix - k_test_ft_mean
+                cov_k = (diff.T @ diff) / nk                        # covariance matrix of the data samples of class k using a given feature set
+
+                mean_diff = (k_test_ft_mean - test_ft_mean).reshape(-1, 1)
+
+                sw += nk * cov_k / n
+                sb += nk * (mean_diff @ mean_diff.T) / n
+
+            # calculate J value
+            j = np.trace(sb) / (np.trace(sw) + 1e-5)
+
+            # update the best J value and best feature set if the J value is larger
+            if j > best_j:
+                best_j = j
+                best_ft_set = test_ft_set
+
+        selected_ft_idx = best_ft_set.copy()
+        selected_ft_name = []
+        for idx in selected_ft_idx:
+            selected_ft_name.append(ft_idx_name[idx])
+
+        print(f'total number of selected feature: {i}')                            # temp
+        print(f'> selected feature: {selected_ft_name}\t(J Value: {best_j:.4f})')  # temp
 
 
 if __name__=='__main__':
@@ -276,20 +291,26 @@ if __name__=='__main__':
 
     # conduct feature preparation
     print('Start preparing features')
-    feature_preparation(data_path=path)
+    outputs, ft_names = feature_preparation(data_path=path)
 
+    # conduct feature selection
+    print('Start selecting 4 best features')
+    feature_selection(outputs=outputs, ft_names=ft_names)
+
+    """
     # load the data
-    print('Start loading data from the local file')
-    ID, X, y = data_loading()
+    #print('Start loading data from the local file')
+    #ID, X, y = data_loading()
 
     # visualize features
-    print('Visualize the features')
-    feature_visualization(X=X)
+    #print('Visualize the features')
+    #feature_visualization(X=X)
 
     # SVM classification
-    print('Start SVM classification')
-    SVM_classification(X, y)
+    #print('Start SVM classification')
+    #SVM_classification(X, y)
 
     # RF classification
-    print('Start RF classification')
-    RF_classification(X, y)
+    #print('Start RF classification')
+    #RF_classification(X, y)
+    """
