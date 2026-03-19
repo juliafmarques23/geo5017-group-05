@@ -1,23 +1,3 @@
-"""
-This demo shows how to visualize the designed features. Currently, only 2D feature space visualization is supported.
-I use the same data for A2 as my input.
-Each .xyz file is initialized as one urban object, from where a feature vector is computed.
-6 features are defined to describe an urban object.
-Required libraries: numpy, scipy, scikit learn, matplotlib, tqdm 
-"""
-
-import math
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.neighbors import KDTree
-from sklearn import svm
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, confusion_matrix
-from scipy.spatial import ConvexHull
-from tqdm import tqdm
-from os.path import exists, join
-from os import listdir
-
 
 class urban_object:
     """
@@ -283,6 +263,15 @@ def feature_selection(outputs, ft_names):
         print(f'total number of selected feature: {i}')                            # temp
         print(f'> selected feature: {selected_ft_name}\t(J Value: {best_j:.4f})')  # temp
 
+    filter_cols = selected_ft_idx.copy()
+    filter_cols = [int(x + 2) for x in filter_cols]
+    filter_cols.insert(0, 0)  # add the cloud_ID column
+    filter_cols.insert(1, 1)  # add the label column
+
+    filtered_outputs = outputs[:, filter_cols]
+
+    return filtered_outputs
+
 
 if __name__=='__main__':
     # specify the data folder
@@ -295,7 +284,7 @@ if __name__=='__main__':
 
     # conduct feature selection
     print('Start selecting 4 best features')
-    feature_selection(outputs=outputs, ft_names=ft_names)
+    filtered_outputs = feature_selection(outputs=outputs, ft_names=ft_names)  # [could_ID, class_label, selected_ft1, selected_ft2, selected_ft3, selected_ft4]
 
     """
     # load the data
