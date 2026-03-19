@@ -1,3 +1,22 @@
+"""
+This demo shows how to visualize the designed features. Currently, only 2D feature space visualization is supported.
+I use the same data for A2 as my input.
+Each .xyz file is initialized as one urban object, from where a feature vector is computed.
+6 features are defined to describe an urban object.
+Required libraries: numpy, scipy, scikit learn, matplotlib, tqdm 
+"""
+
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.neighbors import KDTree
+from sklearn import svm
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix
+from scipy.spatial import ConvexHull
+from tqdm import tqdm
+from os.path import exists, join
+from os import listdir
 
 class urban_object:
     """
