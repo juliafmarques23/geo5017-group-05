@@ -13,6 +13,7 @@ from sklearn.neighbors import KDTree
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
 from scipy.spatial import ConvexHull
 from tqdm import tqdm
 from os.path import exists, join
@@ -260,19 +261,42 @@ def SVM_classification(X, y):
     print(conf)
 
 
-def RF_classification(X, y):
+def RF_classification(X, y, test_size=0.4):
     """
     Conduct RF classification
         X: features
         y: labels
     """
-    pass
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
+    rfc = RandomForestClassifier(n_estimators=20, max_samples=100, max_features=2)
+    rfc.fit(X_train, y_train)
+    y_preds = rfc.predict(X_test)
+    acc = accuracy_score(y_test, y_preds)
+    conf = confusion_matrix(y_test, y_preds)
+    print("RF accuracy: %5.2f" % acc)
+    #print("confusion matrix")
+    #print(conf)
+    return acc
 
+def learning_curve(X, y):
+    train_percentage = []
+    accuracy = []
+    for i in range (5, 100, 5):
+        acc = RF_classification(X, y, test_size=i)
+        train_percentage.append(i)
+        accuracy.append(acc)
+
+    fig = plt.figure()
+    ax = plt.axes()
+    ax.plot( train_percentage, accuracy)
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 1)
+    plt.show()
 
 if __name__=='__main__':
     # specify the data folder
     """"Here you need to specify your own path"""
-    path = '/Users/moonchaeyeon/PycharmProjects/q3_ml/GEO5017-A2-Classification/pointclouds-500/pointclouds-500'
+    path = r'C:\Users\Julia Marques\Documents\0. GEOMATICS_2\Machine Learning\GEO5017-A2-Classification\pointclouds-500\pointclouds-500'
 
     # conduct feature preparation
     print('Start preparing features')
@@ -284,12 +308,13 @@ if __name__=='__main__':
 
     # visualize features
     print('Visualize the features')
-    feature_visualization(X=X)
+    #feature_visualization(X=X)
 
     # SVM classification
     print('Start SVM classification')
-    SVM_classification(X, y)
+    #SVM_classification(X, y)
 
     # RF classification
     print('Start RF classification')
     RF_classification(X, y)
+    learning_curve(X, y)
