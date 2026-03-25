@@ -356,7 +356,8 @@ def learning_curve(X, y, **best_params):
 
 def tune_svm_hyperparameters(X, y):
     """
-    Explicitly tests Linear, RBF, and Poly kernels with different C, gamma, and degree
+    Tests Linear, RBF, and Poly kernels with different C, gamma, and degree
+    to find the best parameters and compare the different kernels for SVM.
     """
     best_acc = 0
     best_config = {}
@@ -378,8 +379,8 @@ def tune_svm_hyperparameters(X, y):
                 best_acc = acc
                 best_config = {'kernel': 'rbf', 'C': c, 'gamma': g}
 
-    # Test Polynomial Kernel (Needs C, Gamma, and Degree)
-    # The notes mention degree=3 in the example [cite: 236]
+    # Test Polynomial kernel (C, Gamma, and Degree)
+    # The notes mention degree=3 in the example
     print("Tuning Polynomial Kernel...")
     for c in [0.1, 1, 10]:
         for d in [2, 3]:
@@ -408,6 +409,17 @@ if __name__=='__main__':
 
     y = filtered_outputs[:, 1]
     X = filtered_outputs[:, 2:]
+
+    # Run the tuning function
+    best_params = tune_svm_hyperparameters(X, y)
+
+    # Final evaluation of the Recommended Model
+    print('\n--- Final Recommended SVM Model ---')
+    SVM_classification(X, y, **best_params, verbose=True)
+
+    learning_curve(X, y, **best_params)
+
+
 
     # # Hyperparameter analysis
     # print('Hyperparameter Analysis')
@@ -494,17 +506,6 @@ if __name__=='__main__':
     #     print(f"Kernel: {k:7}  | Accuracy: {acc:.4f}")
     #
     # print("\nGenerating Learning Curves ")
-
-    # Run the explicit tuning function
-    best_params = tune_svm_hyperparameters(X, y)
-
-    # Final evaluation of the Recommended Model
-    print('\n--- Final Recommended SVM Model ---')
-    SVM_classification(X, y, **best_params, verbose=True)
-
-    learning_curve(X, y, **best_params)
-
-
 
 
 
