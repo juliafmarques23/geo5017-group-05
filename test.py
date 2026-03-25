@@ -357,7 +357,8 @@ def learning_curve(X, y, **best_params):
 def tune_svm_hyperparameters(X, y):
     """
     Tests Linear, RBF, and Poly kernels with different C, gamma, and degree
-    to find the best parameters and compare the different kernels for SVM.
+    to find the optimal parameters for each kernel
+    and then compare them to find the best one for SVM (for our features).
     """
     best_acc = 0
     best_config = {}
@@ -418,95 +419,6 @@ if __name__=='__main__':
     SVM_classification(X, y, **best_params, verbose=True)
 
     learning_curve(X, y, **best_params)
-
-
-
-    # # Hyperparameter analysis
-    # print('Hyperparameter Analysis')
-    # # Test Kernels for SVM
-    # for k in ['linear', 'rbf', 'poly']:
-    #     acc = SVM_classification(X, y, kernel=k)
-    #     print(f"Kernel: {k} | Accuracy: {acc:.4f}")
-    #
-    #     # 2. Since RBF is likely best, tune C and Gamma specifically for it
-    #     print("\n--- Tuning RBF Hyperparameters (C and Gamma) ---")
-    #     best_rbf_acc = 0
-    #     best_params = {}
-    #
-    #     for c_val in [0.1, 1.0, 10]:
-    #         for g_val in [0.1, 0.5, 1.0, 'scale']:
-    #             acc = SVM_classification(X, y, kernel='rbf', C=c_val, gamma=g_val)
-    #             print(f"RBF Kernel | C: {c_val} | Gamma: {g_val} | Accuracy: {acc:.4f}")
-    #
-    #             if acc > best_rbf_acc:
-    #                 best_rbf_acc = acc
-    #                 best_params = {'C': c_val, 'gamma': g_val}
-    #
-    #     print(f"\nRecommended RBF Params: {best_params} with Accuracy: {best_rbf_acc:.4f}")
-    #
-    #
-    #
-    # print('Final Recommended SVM Model')
-    # # Set verbose=True here so it prints the one matrix you need for your report
-    # SVM_classification(X, y, kernel='rbf', C=1.0, verbose=True)
-    #
-    # print("\nGenerating Learning Curves...")
-    # learning_curve(X, y)
-
-    # # 1. Hyperparameter Analysis: Test Kernels (Requirement 2.2)
-    # print('\n--- Hyperparameter Analysis: Kernel Comparison ---')
-    # kernel_results = {}
-    # for k in ['linear', 'rbf', 'poly']:
-    #     # verbose=False keeps this quiet
-    #     acc = SVM_classification(X, y, kernel=k, verbose=False)
-    #     kernel_results[k] = acc
-    #     print(f"Kernel: {k} | Accuracy: {acc:.4f}")
-    #
-    # # 2. Tuning the Recommended Kernel (RBF)
-    # # Based on notes, RBF usually outperforms Poly [cite: 367]
-    # print('\n--- Tuning RBF Hyperparameters (C and Gamma) ---')
-    # best_rbf_acc = 0
-    # best_params = {}
-    #
-    # for c_val in [0.1, 1.0, 10]:
-    #     for g_val in [0.1, 0.5, 1.0, 'scale']:
-    #         acc = SVM_classification(X, y, kernel='rbf', C=c_val, gamma=g_val, verbose=False)
-    #         if acc > best_rbf_acc:
-    #             best_rbf_acc = acc
-    #             best_params = {'C': c_val, 'gamma': g_val}
-    #
-    # print(f"Best RBF Params Found: {best_params} with Accuracy: {best_rbf_acc:.4f}")
-    #
-    # # 3. Final Model Evaluation (Requirement 3: Error Analysis)
-    # print('\n--- Final Recommended SVM Model for Report ---')
-    # # This is the ONLY one that prints the Confusion Matrix
-    # SVM_classification(X, y, kernel='rbf', **best_params, verbose=True)
-
-    # # 1. Tuning the RBF (The Recommended Kernel) first
-    # print('\n--- Tuning RBF Hyperparameters (C and Gamma) ---')
-    # best_rbf_acc = 0
-    # best_params = {}
-    #
-    # for c_val in [0.1, 1.0, 10]:
-    #     for g_val in [0.1, 0.5, 1.0, 'scale']:
-    #         acc = SVM_classification(X, y, kernel='rbf', C=c_val, gamma=g_val)
-    #         if acc > best_rbf_acc:
-    #             best_rbf_acc = acc
-    #             best_params = {'C': c_val, 'gamma': g_val}
-    #
-    # # 2. Now do the "Final Kernel Comparison" using the best C found
-    # print('\n--- Final Comparison: Optimized RBF vs. Others ---')
-    # # Use the best C for all of them to make it fairer
-    # best_c = best_params['C']
-    # for k in ['linear', 'rbf', 'poly']:
-    #     if k == 'rbf':
-    #         acc = best_rbf_acc
-    #     else:
-    #         acc = SVM_classification(X, y, kernel=k)
-    #     print(f"Kernel: {k:7}  | Accuracy: {acc:.4f}")
-    #
-    # print("\nGenerating Learning Curves ")
-
 
 
 
