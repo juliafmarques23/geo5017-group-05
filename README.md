@@ -15,6 +15,7 @@ The main function was specifically designed to answer the questions of this assi
 
 #### Repository Structure
 ```
+/A1/
 /A2/
   └── /code/
          └── main.py       # Main script 
