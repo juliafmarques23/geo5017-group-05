@@ -11,13 +11,6 @@ Julia Fossa Marques (6550975)
 ### Description
 This project aims to classify a dataset of 500 pre-segmented urban point clouds into five classes: building, car, fence, pole, and tree. To achieve this, we developed a feature-based classification code using two supervised learning classifiers: Support Vector Machine (SVM) and Random Forest (RF).
 
-
-to briefly explain how to run the code and
-reproduce the results, e.g., dependence on external libraries/packages (in-
-cluding the commands for installing them), 
-the path to data, 
-
-
 The main function was specifically designed to answer the questions of this assignment, using the data provided for it; it is not necessary to provide any aditional arguments to reproduce the results shown in the report.
 
 #### Repository Structure
