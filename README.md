@@ -17,7 +17,7 @@ The main function was specifically designed to answer the questions of this assi
 ```
 /A2/
   └── /code/
-         └── main.py       # Main script containing gradient descent solver and plotting function
+         └── main.py       # Main script 
          └── ReadMe.txt    # Instructions and project info
 ```
 
