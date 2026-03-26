@@ -1,4 +1,4 @@
-# GEO5017 - Machine Learning (2026) Assignment 1
+# GEO5017 - Machine Learning (2026) Assignment 2
 
 **Group 05**  
 Chaeyeon Moon (6477453)  
@@ -6,56 +6,46 @@ Evangelia Palli (6435939)
 Julia Fossa Marques (6550975)  
 
 
-## Project: Linear Regression / Drone Trajectory Analysis
+## Project: Objects Classification from AirBorne LiDAR Data
 
 ### Description
-This project implements polynomial regression using gradient descent to model the motion of a drone in 3D space. Two motion models are considered:
+This project aims to classify a dataset of 500 pre-segmented urban point clouds into five classes: building, car, fence, pole, and tree. To achieve this, we developed a feature-based classification code using two supervised learning classifiers: Support Vector Machine (SVM) and Random Forest (RF).
 
-- Constant velocity
-- Constant acceleration
 
-The program fits the models to observed positions and predicts the drone's next position (t=7) based on the constant acceleration model. It also plots the 3D trajectory using Plotly.
+to briefly explain how to run the code and
+reproduce the results, e.g., dependence on external libraries/packages (in-
+cluding the commands for installing them), 
+the path to data, 
+
 
 The main function was specifically designed to answer the questions of this assignment, using the data provided for it; it is not necessary to provide any aditional arguments to reproduce the results shown in the report.
 
 #### Repository Structure
 ```
-/code/
-   └── main.py  # Main script containing gradient descent solver and plotting function
-ReadMe.txt      # Instructions and project info
+/A2/
+  └── /code/
+         └── main.py       # Main script containing gradient descent solver and plotting function
+         └── ReadMe.txt    # Instructions and project info
 ```
 
 ### Setup
-The program works with minimal setup; the only modules required, besides Python's standard library, are **numpy** and **plotly**.
+The program works with minimal setup; Besides Python's standard library, the following 5 libraries are required. **matplotlib**, **numpy**, **sklearn**, **scipy**, and **tqdm**.
 
-**Install Numpy** 
+**Command for Installation** 
 ```
-pyhton -m pip install numpy
+python -m pip install matplotlib numpy scikit-learn scipy tqdm
 ```
-**Install Plotly** 
-```
-python -m pip install plotly
-```
-
-The following **parameters** are tunable:
-- _learning_rate_ : float
-Learning rate of the gradient descent algorithm. If it is not specified, the default value (**0.001**) is used.
-
-- _max_iter_ : int
-Maximum number of times the parameters optimization is performed. If it is not specified, the default value (**10,000**) is used.
 
 ### How to Run
 
 1. Navigate to the `/code/` folder
-2. Run `main.py`
+2. Run `main.py` with the path to input data
+```
+CHANGE ME - INPUT DATA PATH
+```
 
 ### Expected Output
-- Velocity vector for constant velocity model
-- Residual errors for constant velocity and acceleration models
-- 3D plot showing:
-  - Observed points ($t$ = 1 ~ 6)
-  - Fitted trajectory using constant acceleration model
-  - Predicted position at $t$ = 7
+- CHANGE ME
  
 **Notes**
 The code is fully reproducible with the provided data points.
