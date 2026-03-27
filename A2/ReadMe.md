@@ -23,7 +23,7 @@ The main function was specifically designed to answer the questions of this assi
 ```
 
 ### Setup
-The program works with minimal setup; Besides Python's standard library, the following 5 libraries are required. **matplotlib**, **numpy**, **sklearn**, **scipy**, and **tqdm**.
+The program works with minimal setup; Besides Python's standard library, the following 5 libraries are required: **matplotlib**, **numpy**, **sklearn**, **scipy**, and **tqdm**.
 
 **Command for Installation** 
 ```
