@@ -103,18 +103,18 @@ class urban_object:
         self.feature.append(planarity)
         self.feature_names.append('planarity')
 
-        # [+ feature 8] 3d bounding box volume
+        # [+ feature 8] Volume of the Axis-Aligned Bounding Box (AABB)
         dx = np.amax(self.points[:, 0]) - np.amin(self.points[:, 0])
         dy = np.amax(self.points[:, 1]) - np.amin(self.points[:, 1])
         dz = np.amax(self.points[:, 2]) - np.amin(self.points[:, 2])
         bbox_vol = dx * dy * dz
-        self.feature.append(bbox_vol)
-        self.feature_names.append('bbox_vol')
+        self.feature.append(AABB_vol)
+        self.feature_names.append('AABB_vol')
 
-        # [+ feature 9] 3d bounding box density
+        # [+ feature 9] AABB density
         bbox_density = len(self.points) / (bbox_vol + 1e-5)
-        self.feature.append(bbox_density)
-        self.feature_names.append('bbox_density')
+        self.feature.append(AABB_density)
+        self.feature_names.append('AABB_density')
 
         # [+ feature 10] upper half ratio
         top_z = top[0, 2]
