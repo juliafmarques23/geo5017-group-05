@@ -447,7 +447,7 @@ def tune_svm_hyperparameters(X, y):
 
 if __name__=='__main__':
     # specify the data folder
-    """"Here you need to specify your own path"""
+    """Here you need to specify your own path"""
     path = r"C:\Users\evang\Documents\Q3\GEO5017\ass02\GEO5017-A2-Classification\pointclouds-500\pointclouds-500"
 
     # conduct feature preparation
