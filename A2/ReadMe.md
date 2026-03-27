@@ -33,13 +33,19 @@ python -m pip install matplotlib numpy scikit-learn scipy tqdm
 ### How to Run
 
 1. Navigate to the `/code/` folder
-2. Run `main.py` with the path to input data
-```
-CHANGE ME - INPUT DATA PATH
-```
+2. Run `main.py` after changing the input data path
 
 ### Expected Output
-- CHANGE ME
+
+The following results will be printed:
+- Selected features
+- Optimal hyperparameters
+- Accuracy scores and confusion matrices for both classifiers
+
+The following figures will be displayed:
+- Plot 1. Learning curve for the SVM classifier
+- Plot 2. Learning curve for the RF classifier
+- Plot 3. Comparison of learning curves: SVM vs. RF
  
 **Notes**
 The code is fully reproducible with the provided data points.
