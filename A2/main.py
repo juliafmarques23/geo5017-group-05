@@ -112,7 +112,7 @@ class urban_object:
         self.feature_names.append('AABB_vol')
 
         # [+ feature 9] AABB density
-        AABB_density = len(self.points) / (bbox_vol + 1e-5)
+        AABB_density = len(self.points) / (AABB_vol + 1e-5)
         self.feature.append(AABB_density)
         self.feature_names.append('AABB_density')
 
