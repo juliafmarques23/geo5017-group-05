@@ -336,35 +336,34 @@ def RF_classification(X, y, test_size=0.4):
     print("Confusion Matrix:")
     print(cmatrix)
 
+
 def learning_curve(X, y, svm_params, rf_params):
     """
-    Plots Train and Test Accuracies for both SVM and RF on the same graph.
-    Directly compares generalization and performance across models.
+    Generates three separate plots for the final report:
+    1. SVM Train vs. Test (Generalization check)
+    2. RF Train vs. Test (Generalization check)
+    3. SVM Test vs. RF Test (Model Performance Comparison)
     """
     test_percentages = []
-
-    # Storage for SVM results
     svm_train_scores, svm_test_scores = [], []
-    # Storage for RF results
     rf_train_scores, rf_test_scores = [], []
 
     for i in range(5, 100, 5):
         test_size = i / 100.0
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
-        # SVM Processing (Scaling is essential)
+        # SVM Path (with scaling)
         scaler = StandardScaler()
         X_train_svm = scaler.fit_transform(X_train)
         X_test_svm = scaler.transform(X_test)
-
         clf_svm = svm.SVC(**svm_params)
         clf_svm.fit(X_train_svm, y_train)
 
         svm_train_scores.append(accuracy_score(y_train, clf_svm.predict(X_train_svm)))
         svm_test_scores.append(accuracy_score(y_test, clf_svm.predict(X_test_svm)))
 
-        # RF Processing
-        clf_rf = RandomForestClassifier(**rf_params)
+        #  RF Path
+        clf_rf = RandomForestClassifier(**rf_params, random_state=42)
         clf_rf.fit(X_train, y_train)
 
         rf_train_scores.append(accuracy_score(y_train, clf_rf.predict(X_train)))
@@ -372,23 +371,40 @@ def learning_curve(X, y, svm_params, rf_params):
 
         test_percentages.append(i)
 
-    # Plotting
-    plt.figure(figsize=(12, 7))
-
-    # SVM Plotting
-    plt.plot(test_percentages, svm_train_scores, label='SVM Train', marker='o', linestyle='--', color='blue', alpha=0.6)
+    # FIGURE 1: SVM Train vs. Test
+    plt.figure(figsize=(10, 6))
+    plt.plot(test_percentages, svm_train_scores, label='SVM Train', marker='o', linestyle='--', color='blue', alpha=0.5)
     plt.plot(test_percentages, svm_test_scores, label='SVM Test (Linear, C=10)', marker='o', linestyle='-',
              color='blue')
-
-    # RF Plotting
-    plt.plot(test_percentages, rf_train_scores, label='RF Train', marker='s', linestyle='--', color='green', alpha=0.6)
-    plt.plot(test_percentages, rf_test_scores, label='RF Test', marker='s', linestyle='-', color='green')
-
-    plt.title('Learning Curve: SVM vs. Random Forest')
+    plt.title('SVM Learning Curve: Train vs. Test')
     plt.xlabel('Test Set Percentage (%)')
     plt.ylabel('Accuracy')
     plt.ylim(0.7, 1.05)
-    plt.legend(loc='lower left', ncol=2)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # FIGURE 2: RF Train vs. Test
+    plt.figure(figsize=(10, 6))
+    plt.plot(test_percentages, rf_train_scores, label='RF Train', marker='s', linestyle='--', color='green', alpha=0.5)
+    plt.plot(test_percentages, rf_test_scores, label='RF Test', marker='s', linestyle='-', color='green')
+    plt.title('RF Learning Curve: Train vs. Test')
+    plt.xlabel('Test Set Percentage (%)')
+    plt.ylabel('Accuracy')
+    plt.ylim(0.7, 1.05)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    # FIGURE 3: SVM Test vs. RF Test
+    plt.figure(figsize=(10, 6))
+    plt.plot(test_percentages, svm_test_scores, label='SVM Test Accuracy', marker='o', color='blue')
+    plt.plot(test_percentages, rf_test_scores, label='RF Test Accuracy', marker='s', color='green')
+    plt.title('Final Comparison: SVM vs. RF Test Accuracy')
+    plt.xlabel('Test Set Percentage (%)')
+    plt.ylabel('Accuracy')
+    plt.ylim(0.7, 1.0)
+    plt.legend()
     plt.grid(True)
     plt.show()
 
