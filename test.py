@@ -1,15 +1,8 @@
-"""
-This demo shows how to visualize the designed features. Currently, only 2D feature space visualization is supported.
-I use the same data for A2 as my input.
-Each .xyz file is initialized as one urban object, from where a feature vector is computed.
-6 features are defined to describe an urban object.
-Required libraries: numpy, scipy, scikit learn, matplotlib, tqdm
-"""
-
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.neighbors import KDTree
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -146,7 +139,6 @@ class urban_object:
         self.feature.append(total_points)
         self.feature_names.append('total_points')
 
-
 def read_xyz(filenm):
     """
     Reading points
@@ -160,7 +152,6 @@ def read_xyz(filenm):
             points.append(p)
     points = np.array(points).astype(np.float32)
     return points
-
 
 def feature_preparation(data_path):
     """
@@ -211,22 +202,8 @@ def feature_preparation(data_path):
 
     return outputs, ft_names
 
-# def data_loading(data_file='data.txt'):
-#     """
-#     Read the data with features from the data file
-#         data_file: the local file to read data with features and labels
-#     """
-#     # load data
-#     data = np.loadtxt(data_file, dtype=np.float32, delimiter=',', comments='#')
-#
-#     # extract object ID, feature X and label Y
-#     ID = data[:, 0].astype(np.int32)
-#     y = data[:, 1].astype(np.int32)
-#     X = data[:, 2:].astype(np.float32)
-#
-#     return ID, X, y
-
 def feature_selection(outputs, ft_names):
+    """This function selects the optimal features"""
     ft_idx_name = {}  # {feature_index : feature_name}
     for name in ft_names:
         ft_idx_name[ft_names.index(name)] = name
@@ -295,8 +272,8 @@ def feature_selection(outputs, ft_names):
         for idx in selected_ft_idx:
             selected_ft_name.append(ft_idx_name[idx])
 
-        print(f'total number of selected feature: {i}')                            # temp
-        print(f'> selected feature: {selected_ft_name}\t(J Value: {best_j:.4f})')  # temp
+        if i == 4:
+            print(f'> selected feature: {selected_ft_name}')
 
     filter_cols = selected_ft_idx.copy()
     filter_cols = [int(x + 2) for x in filter_cols]
@@ -310,19 +287,25 @@ def feature_selection(outputs, ft_names):
 def SVM_classification(X, y, test_size=0.4, kernel='rbf', C=1.0, gamma='scale', degree=3, verbose=False):
     """
     Conduct SVM classification
-        X: features
-        y: labels
+        Parameters:
+        X: Feature matrix (e.g., planarity, root_density).
+        y: Target labels (urban object classes).
+        test_size: Proportion of the dataset to include in the test split (0.0 to 1.0).
+        kernel: Kernel function ('linear', 'rbf', or 'poly') to map data to high-dimensional space.
+        C: Regularization parameter, balances margin width vs. classification error.
+        gamma: Kernel coefficient for RBF, defines the reach of a single training example's influence.
+        degree: Degree of the polynomial kernel function (ignored by other kernels).
+        verbose: If True, prints accuracy and the confusion matrix.
     """
     # split the data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
-
-    # Scale the features (important for SVM!)
+    # Scale the features
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    clf = svm.SVC(kernel=kernel, C=C, gamma=gamma, degree=degree)
+    clf = svm.SVC(kernel=kernel, C=C, gamma=gamma, degree=degree, random_state=42)
     clf.fit(X_train, y_train)
 
     y_preds = clf.predict(X_test)
@@ -335,22 +318,77 @@ def SVM_classification(X, y, test_size=0.4, kernel='rbf', C=1.0, gamma='scale', 
 
     return acc
 
-def learning_curve(X, y, **best_params):
+def RF_classification(X, y, test_size=0.4):
+    """
+    Conduct RF classification
+        X: features
+        y: labels
+    """
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+    rfc = RandomForestClassifier(n_estimators=200, min_samples_split=2, min_samples_leaf=1,
+                                 bootstrap=True, max_samples=0.5, max_leaf_nodes=400,
+                                 max_features=2, max_depth=20, criterion='gini', random_state=42)
+    rfc.fit(X_train, y_train)
+    y_preds = rfc.predict(X_test)
+    accuracy = accuracy_score(y_test, y_preds)
+    cmatrix = confusion_matrix(y_test, y_preds)
+    print("RF accuracy: %5.2f" % accuracy)
+    print("Confusion Matrix:")
+    print(cmatrix)
+
+def learning_curve(X, y, svm_params, rf_params):
+    """
+    Plots Train and Test Accuracies for both SVM and RF on the same graph.
+    Directly compares generalization and performance across models.
+    """
     test_percentages = []
-    accuracies = []
+
+    # Storage for SVM results
+    svm_train_scores, svm_test_scores = [], []
+    # Storage for RF results
+    rf_train_scores, rf_test_scores = [], []
 
     for i in range(5, 100, 5):
-        # Pass i/100 (e.g., 0.05, 0.10...)
-        acc = SVM_classification(X, y, test_size=i / 100.0, **best_params)
+        test_size = i / 100.0
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+
+        # SVM Processing (Scaling is essential)
+        scaler = StandardScaler()
+        X_train_svm = scaler.fit_transform(X_train)
+        X_test_svm = scaler.transform(X_test)
+
+        clf_svm = svm.SVC(**svm_params)
+        clf_svm.fit(X_train_svm, y_train)
+
+        svm_train_scores.append(accuracy_score(y_train, clf_svm.predict(X_train_svm)))
+        svm_test_scores.append(accuracy_score(y_test, clf_svm.predict(X_test_svm)))
+
+        # RF Processing
+        clf_rf = RandomForestClassifier(**rf_params)
+        clf_rf.fit(X_train, y_train)
+
+        rf_train_scores.append(accuracy_score(y_train, clf_rf.predict(X_train)))
+        rf_test_scores.append(accuracy_score(y_test, clf_rf.predict(X_test)))
 
         test_percentages.append(i)
-        accuracies.append(acc)
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(test_percentages, accuracies, marker='o', linestyle='-')
-    plt.title('SVM Accuracy vs. Test Set Size')
+    # Plotting
+    plt.figure(figsize=(12, 7))
+
+    # SVM Plotting
+    plt.plot(test_percentages, svm_train_scores, label='SVM Train', marker='o', linestyle='--', color='blue', alpha=0.6)
+    plt.plot(test_percentages, svm_test_scores, label='SVM Test (Linear, C=10)', marker='o', linestyle='-',
+             color='blue')
+
+    # RF Plotting
+    plt.plot(test_percentages, rf_train_scores, label='RF Train', marker='s', linestyle='--', color='green', alpha=0.6)
+    plt.plot(test_percentages, rf_test_scores, label='RF Test', marker='s', linestyle='-', color='green')
+
+    plt.title('Learning Curve: SVM vs. Random Forest')
     plt.xlabel('Test Set Percentage (%)')
     plt.ylabel('Accuracy')
+    plt.ylim(0.7, 1.05)
+    plt.legend(loc='lower left', ncol=2)
     plt.grid(True)
     plt.show()
 
@@ -364,17 +402,15 @@ def tune_svm_hyperparameters(X, y):
     best_config = {}
 
     # Test Linear Kernel (Only needs C)
-    print("Tuning Linear Kernel...")
-    for c in [0.1, 1, 10]:
+    for c in [0.1, 1, 10, 100]:
         acc = SVM_classification(X, y, kernel='linear', C=c)
         if acc > best_acc:
             best_acc = acc
             best_config = {'kernel': 'linear', 'C': c}
 
     # Test RBF Kernel (Needs C and Gamma)
-    print("Tuning RBF Kernel...")
-    for c in [0.1, 1, 10]:
-        for g in [0.1, 0.5, 'scale']:
+    for c in [0.1, 1, 10, 100]:
+        for g in [0.01, 0.1, 0.5, 'scale']:
             acc = SVM_classification(X, y, kernel='rbf', C=c, gamma=g)
             if acc > best_acc:
                 best_acc = acc
@@ -382,15 +418,14 @@ def tune_svm_hyperparameters(X, y):
 
     # Test Polynomial kernel (C, Gamma, and Degree)
     # The notes mention degree=3 in the example
-    print("Tuning Polynomial Kernel...")
-    for c in [0.1, 1, 10]:
+    for c in [0.1, 1, 10, 100]:
         for d in [2, 3]:
             acc = SVM_classification(X, y, kernel='poly', C=c, degree=d)
             if acc > best_acc:
                 best_acc = acc
                 best_config = {'kernel': 'poly', 'C': c, 'degree': d}
 
-    print(f"\nOptimization Complete! Best Config: {best_config} | Accuracy: {best_acc:.4f}")
+    print(f"> optimization complete! Best Config: {best_config} | Accuracy: {best_acc:.4f}")
     return best_config
 
 
@@ -400,42 +435,30 @@ if __name__=='__main__':
     path = r"C:\Users\evang\Documents\Q3\GEO5017\ass02\GEO5017-A2-Classification\pointclouds-500\pointclouds-500"
 
     # conduct feature preparation
-    print('Start preparing features')
+    print('>> Start preparing features')
     outputs, ft_names = feature_preparation(data_path=path)
 
     # conduct feature selection
-    print('Start selecting 4 best features')
+    print('>> Start selecting 4 best features')
     filtered_outputs = feature_selection(outputs=outputs, ft_names=ft_names)
     # [could_ID, class_label, selected_ft1, selected_ft2, selected_ft3, selected_ft4]
 
-    y = filtered_outputs[:, 1]
-    X = filtered_outputs[:, 2:]
-
-    # Run the tuning function
-    best_params = tune_svm_hyperparameters(X, y)
+    X, y = filtered_outputs[:, 2:], filtered_outputs[:, 1]
+    # Run the tuning function for SVM
+    print('>> Start tuning SVM')
+    svm_params = tune_svm_hyperparameters(X, y)
 
     # Final evaluation of the Recommended Model
-    print('\n--- Final Recommended SVM Model ---')
-    SVM_classification(X, y, **best_params, verbose=True)
+    print('>> Start SVM classification')
+    SVM_classification(X, y, **svm_params, verbose=True)
 
-    learning_curve(X, y, **best_params)
+    # For her RF
+    rf_params = {
+        'n_estimators': 200, 'max_features': 2, 'max_samples': 0.5,
+        'criterion': 'gini', 'max_depth': 20
+    }
 
+    print('>> Start RF classification')
+    RF_classification(X, y)
 
-
-    """
-    # load the data
-    #print('Start loading data from the local file')
-    #ID, X, y = data_loading()
-
-    # visualize features
-    #print('Visualize the features')
-    #feature_visualization(X=X)
-
-    # SVM classification
-    #print('Start SVM classification')
-    #SVM_classification(X, y)
-
-    # RF classification
-    #print('Start RF classification')
-    #RF_classification(X, y)
-    """
+    learning_curve(X, y, svm_params, rf_params)
